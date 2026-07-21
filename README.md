@@ -1,6 +1,6 @@
 # Meeting-room-booking-service
 
 
-python -m uvicorn main:app --reload
-
 .\Activate.ps1     
+
+poetry run uvicorn app.main:app --reload
