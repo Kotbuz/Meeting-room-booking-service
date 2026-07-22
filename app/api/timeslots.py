@@ -1,14 +1,14 @@
 from fastapi import APIRouter
 from sqlalchemy import select
 from app.dependencies.base_dependencies import SessionDep
-from app.models.Timeslots import TimeSlotModel
-from app.schemas.Timeslots import TimeSlotSchema
+from app.models.timeslots import TimeSlotModel
+from app.schemas.timeslots import TimeSlotAddSchema
 
-router = APIRouter()
+router = APIRouter(tags=["Timeslots"])
 
 
 @router.post("/timeslots")
-async def add_timeslot(data: TimeSlotSchema, session: SessionDep):
+async def add_timeslot(data: TimeSlotAddSchema, session: SessionDep):
     new_timeslot = TimeSlotModel(
         start_time=data.start_time, end_time=data.end_time, room_id=data.room_id
     )

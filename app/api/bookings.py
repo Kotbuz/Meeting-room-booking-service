@@ -2,13 +2,13 @@ from fastapi import APIRouter
 from sqlalchemy import select
 from app.dependencies.base_dependencies import SessionDep
 from app.models.bookings import BookingModel
-from app.schemas.bookings import BookingSchema
+from app.schemas.bookings import BookingAddSchema
 
-router = APIRouter()
+router = APIRouter(tags=["Bookings"])
 
 
 @router.post("/bookings")
-async def add_booking(data: BookingSchema, session: SessionDep):
+async def add_booking(data: BookingAddSchema, session: SessionDep):
     new_booking = BookingModel(
         user_id=data.user_id,
         room_id=data.room_id,

@@ -2,16 +2,20 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    # PostgreSQL
     postgres_user: str
     postgres_password: str
     postgres_db: str
     postgres_host: str
     postgres_port: int
+    app_host_port: int
 
+    # JWT
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
 
+    # FastAPI
     debug: bool = False
 
     model_config = SettingsConfigDict(

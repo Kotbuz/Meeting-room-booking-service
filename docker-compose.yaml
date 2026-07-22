@@ -1,27 +1,44 @@
 services:
+
+  db:
+    container_name: my_project_db
+    image: postgres
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} --quiet" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    # ports:
+    #   - ${POSTGRES_PORT}:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: always
+
   app:
     container_name: my_project_app
     build: ./
     depends_on:
-      - db
-    command: bash -c 'while !<dev/tcp/postgers/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0 --port 8000'
-    volumes:
-      - ./app:/src/app
+      db:
+        condition: service_healthy
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    # volumes:
+    #   - .:/app
     ports:
       - ${APP_HOST_PORT}:8000
     restart: always
     env_file:
       - .env
-
-  db:
-    container_name: my_project_db
-    image: postgres
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    ports:
-      - ${POSTGRES_PORT}:5432
-    volumes:
-      - .postgres:/var/lib/postgresql
-    restart: always
+volumes:
+  pg_data:
