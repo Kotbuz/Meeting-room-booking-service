@@ -1,6 +1,7 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
+from app.models.bookings import BookingModel
 
 
 class UserModel(Base):
@@ -9,3 +10,5 @@ class UserModel(Base):
     login: Mapped[str]
     password_hash: Mapped[str]
     role: Mapped[str]
+
+    bookings: Mapped[list["BookingModel"]] = relationship(back_populates="user")
