@@ -18,7 +18,7 @@ async def add_timeslot(data: TimeSlotAddSchema, session: SessionDep):
 
 
 @router.get("/timeslots")
-async def get_timeslots(session: SessionDep):
+async def get_all_timeslots(session: SessionDep):
     query = select(TimeSlotModel)
     result = await session.execute(query)
     return result.scalars().all()

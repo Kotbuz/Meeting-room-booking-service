@@ -16,7 +16,7 @@ async def add_room(data: RoomAddSchema, session: SessionDep):
 
 
 @router.get("/rooms")
-async def get_rooms(session: SessionDep):
+async def get_all_rooms(session: SessionDep):
     query = select(RoomModel)
     result = await session.execute(query)
     return result.scalars().all()

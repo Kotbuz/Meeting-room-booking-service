@@ -4,8 +4,12 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
-from app.models.bookings import BookingModel
-from app.models.rooms import RoomModel
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.rooms import RoomModel
+    from app.models.bookings import BookingModel
 
 
 class TimeSlotModel(Base):

@@ -4,9 +4,13 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
-from app.models.rooms import RoomModel
-from app.models.timeslots import TimeSlotModel
-from app.models.users import UserModel
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.rooms import RoomModel
+    from app.models.users import UserModel
+    from app.models.timeslots import TimeSlotModel
 
 
 class BookingModel(Base):
@@ -17,6 +21,6 @@ class BookingModel(Base):
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"))
     date: Mapped[datetime]
 
+    room: Mapped["RoomModel"] = relationship(back_populates="bookings")
     user: Mapped["UserModel"] = relationship(back_populates="bookings")
     timeslot: Mapped["TimeSlotModel"] = relationship(back_populates="bookings")
-    room: Mapped["RoomModel"] = relationship(back_populates="bookings")

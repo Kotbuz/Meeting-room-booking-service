@@ -21,7 +21,7 @@ async def add_booking(data: BookingAddSchema, session: SessionDep):
 
 
 @router.get("/bookings")
-async def get_bookings(session: SessionDep):
+async def get_all_bookings(session: SessionDep):
     query = select(BookingModel)
     result = await session.execute(query)
     return result.scalars().all()
