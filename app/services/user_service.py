@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import security
@@ -10,7 +11,9 @@ async def create_user(session: AsyncSession, data: UserCreateSchema):
     hashed_password = security.hash_password(data.password)
     existing_user = await repository.get_user_by_login(session, data.login)
     if existing_user:
-        return None
+        raise HTTPException(
+            status_code=400, detail="User with this login already exists"
+        )
     new_user = await repository.create_user(
         session, data.login, hashed_password, data.role
     )
@@ -38,7 +41,7 @@ async def get_all_users(session: AsyncSession):
 async def update_user(session: AsyncSession, user_id: int, data: UserUpdateSchema):
     user = await repository.get_user_by_id(session, user_id)
     if not user:
-        return None
+        raise HTTPException(status_code=404, detail="User does not exists")
 
     existing_user = await repository.get_user_by_login(session, data.login)
 
@@ -59,7 +62,7 @@ async def partial_update_user(
 ):
     user = await repository.get_user_by_id(session, user_id)
     if not user:
-        return None
+        raise HTTPException(status_code=404, detail="User does not exists")
     if data.login is not None:
         existing_user = await repository.get_user_by_login(session, data.login)
 
@@ -80,9 +83,10 @@ async def partial_update_user(
 
 async def delete_user(session: AsyncSession, user_id: int):
     user = await repository.get_user_by_id(session, user_id)
+
     if not user:
-        return None
-    deleted = await repository.delete_user(session, user)
-    if deleted:
-        await repository.save(session)
-    return deleted
+        raise HTTPException(status_code=404, detail="User does not exists")
+
+    await repository.delete_user(session, user)
+    await repository.save(session)
+    return True
