@@ -1,11 +1,21 @@
 from pydantic import BaseModel
 
 
-class RoomAddSchema(BaseModel):
+class RoomCreateSchema(BaseModel):
     name: str
     capacity: int
 
 
-class RoomSchema(RoomAddSchema):
+class RoomSchema(RoomCreateSchema):
     id: int
 
+
+class RoomResponseSchema(BaseModel):
+    id: int
+    name: str
+    capacity: int
+
+
+class RoomUpdateSchema(BaseModel):
+    name: str | None = None
+    capacity: int | None = None
