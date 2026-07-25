@@ -34,7 +34,7 @@ async def get_all_rooms(session: AsyncSession):
     return await repository.get_all_rooms(session)
 
 
-async def update_room(session: AsyncSession, room_id: int, data: RoomUpdateSchema):
+async def update_room(session: AsyncSession, room_id: int, data: RoomCreateSchema):
     room = await repository.get_room_by_id(session, room_id)
     if not room:
         raise HTTPException(status_code=404, detail="Room does not exists")

@@ -20,7 +20,7 @@ async def refresh(session: AsyncSession, instance):
 
 
 async def create_timeslot(
-    session: AsyncSession, *, room_id: int, start_time: datetime, end_time: datetime
+    session: AsyncSession, room_id: int, start_time: datetime, end_time: datetime
 ):
     new_timeslot = TimeSlotModel(
         room_id=room_id, start_time=start_time, end_time=end_time
@@ -59,11 +59,12 @@ async def get_timeslot_by_room_and_time(
     return result.scalars().first()
 
 
-async def get_intersecting_slots(
+async def get_intersecting_timeslots(
     session: AsyncSession,
     room_id: int,
     start_time: datetime,
     end_time: datetime,
+    exclude_id: int | None = None,
 ):
     query = (
         select(TimeSlotModel)
@@ -72,12 +73,21 @@ async def get_intersecting_slots(
         .where(TimeSlotModel.end_time > start_time)
     )
 
+    if exclude_id is not None:
+        query = query.where(TimeSlotModel.id != exclude_id)
+
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
+async def get_all_timeslots(session: AsyncSession):
+    query = select(TimeSlotModel)
     result = await session.execute(query)
     return result.scalars().all()
 
 
 async def update_timeslot(
-    timeslot: TimeSlotModel, *, room_id: int, start_time: datetime, end_time: datetime
+    timeslot: TimeSlotModel, room_id: int, start_time: datetime, end_time: datetime
 ):
     timeslot.room_id = room_id
     timeslot.start_time = start_time
@@ -87,7 +97,6 @@ async def update_timeslot(
 
 async def partial_update_timeslot(
     timeslot: TimeSlotModel,
-    *,
     room_id: int | None = None,
     start_time: datetime | None = None,
     end_time: datetime | None = None,

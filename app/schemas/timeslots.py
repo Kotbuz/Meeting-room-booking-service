@@ -9,10 +9,6 @@ class TimeSlotCreateSchema(BaseModel):
     end_time: datetime
 
 
-class TimeSlotSchema(TimeSlotCreateSchema):
-    id: int
-
-
 class TimeSlotResponseSchema(BaseModel):
     id: int
     room_id: int

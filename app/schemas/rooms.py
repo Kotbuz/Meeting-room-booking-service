@@ -6,10 +6,6 @@ class RoomCreateSchema(BaseModel):
     capacity: int
 
 
-class RoomSchema(RoomCreateSchema):
-    id: int
-
-
 class RoomResponseSchema(BaseModel):
     id: int
     name: str

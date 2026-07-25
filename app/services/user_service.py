@@ -38,7 +38,7 @@ async def get_all_users(session: AsyncSession):
     return await repository.get_all_users(session)
 
 
-async def update_user(session: AsyncSession, user_id: int, data: UserUpdateSchema):
+async def update_user(session: AsyncSession, user_id: int, data: UserCreateSchema):
     user = await repository.get_user_by_id(session, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User does not exists")

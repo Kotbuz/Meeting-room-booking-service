@@ -19,5 +19,3 @@ class UserUpdateSchema(BaseModel):
     role: str | None = None
 
 
-class UserSchema(UserCreateSchema):
-    id: int
