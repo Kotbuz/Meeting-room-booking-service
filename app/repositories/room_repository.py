@@ -7,7 +7,7 @@ from app.models.rooms import RoomModel
 async def save(session: AsyncSession):
     try:
         await session.commit()
-    except:
+    except Exception:
         await session.rollback()
         raise
 
@@ -51,7 +51,9 @@ async def update_room(room: RoomModel, name: str, capacity: int):
     return room
 
 
-async def partial_update_room(room: RoomModel, name: str = None, capacity: int = None):
+async def partial_update_room(
+    room: RoomModel, name: str | None = None, capacity: int | None = None
+):
     if name is not None:
         room.name = name
     if capacity is not None:

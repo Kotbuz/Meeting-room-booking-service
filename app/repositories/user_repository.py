@@ -7,7 +7,7 @@ from app.models.users import UserModel
 async def save(session: AsyncSession):
     try:
         await session.commit()
-    except:
+    except Exception:
         await session.rollback()
         raise
 
@@ -61,9 +61,9 @@ async def update_user(
 
 async def partial_update_user(
     user: UserModel,
-    login: str = None,
-    hashed_password: str = None,
-    role: str = None,
+    login: str | None = None,
+    hashed_password: str | None = None,
+    role: str | None = None,
 ):
     if login is not None:
         user.login = login
