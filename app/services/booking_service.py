@@ -83,6 +83,13 @@ async def get_booking_by_id(session: AsyncSession, booking_id: int):
     return await repository.get_booking_by_id(session, booking_id)
 
 
+async def get_bookings_by_user(session: AsyncSession, user_id: int):
+    user = await user_repository.get_user_by_id(session, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return await repository.get_bookings_by_user(session, user_id)
+
+
 async def get_all_bookings(session: AsyncSession):
     return await repository.get_all_bookings(session)
 
@@ -96,7 +103,7 @@ async def update_booking(
     if not booking:
         raise HTTPException(
             status_code=404,
-            detail="Booking does not exist",
+            detail="Booking not found",
         )
 
     user = await user_repository.get_user_by_id(session, data.user_id)
@@ -163,7 +170,7 @@ async def partial_update_booking(
     if not booking:
         raise HTTPException(
             status_code=404,
-            detail="Booking does not exist",
+            detail="Booking not found",
         )
 
     new_user_id = data.user_id or booking.user_id
@@ -234,7 +241,7 @@ async def delete_booking(
     if not booking:
         raise HTTPException(
             status_code=404,
-            detail="Booking does not exist",
+            detail="Booking not found",
         )
 
     await repository.delete_booking(session, booking)

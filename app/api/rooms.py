@@ -7,7 +7,7 @@ router = APIRouter(tags=["Rooms"])
 
 
 @router.post("/", status_code=201, response_model=RoomResponseSchema)
-async def add_room(session: SessionDep, data: RoomCreateSchema):
+async def create_room(session: SessionDep, data: RoomCreateSchema):
     return await service.create_room(session, data)
 
 

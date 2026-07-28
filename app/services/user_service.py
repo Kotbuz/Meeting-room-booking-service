@@ -41,12 +41,15 @@ async def get_all_users(session: AsyncSession):
 async def update_user(session: AsyncSession, user_id: int, data: UserCreateSchema):
     user = await repository.get_user_by_id(session, user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User does not exists")
+        raise HTTPException(status_code=404, detail="User not found")
 
     existing_user = await repository.get_user_by_login(session, data.login)
 
     if existing_user and existing_user.id != user.id:
-        raise ValueError("User with this login already exists")
+        raise HTTPException(
+            status_code=400,
+            detail="User with this login already exists",
+        )
 
     hashed_password = security.hash_password(data.password)
     updated_user = await repository.update_user(
@@ -62,12 +65,15 @@ async def partial_update_user(
 ):
     user = await repository.get_user_by_id(session, user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User does not exists")
+        raise HTTPException(status_code=404, detail="User not found")
     if data.login is not None:
         existing_user = await repository.get_user_by_login(session, data.login)
 
         if existing_user and existing_user.id != user.id:
-            raise ValueError("User with this login already exists")
+            raise HTTPException(
+                status_code=400,
+                detail="User with this login already exists",
+            )
 
     hashed_password = security.hash_password(data.password) if data.password else None
     updated_user = await repository.partial_update_user(
@@ -85,7 +91,7 @@ async def delete_user(session: AsyncSession, user_id: int):
     user = await repository.get_user_by_id(session, user_id)
 
     if not user:
-        raise HTTPException(status_code=404, detail="User does not exists")
+        raise HTTPException(status_code=404, detail="User not found")
 
     await repository.delete_user(session, user)
     await repository.save(session)

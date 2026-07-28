@@ -13,7 +13,7 @@ router = APIRouter(tags=["Timeslots"])
 
 
 @router.post("/", status_code=201, response_model=TimeSlotResponseSchema)
-async def add_timeslot(session: SessionDep, data: TimeSlotCreateSchema):
+async def create_timeslot(session: SessionDep, data: TimeSlotCreateSchema):
     return await service.create_timeslot(session, data)
 
 

@@ -10,7 +10,9 @@ from app.schemas.timeslots import TimeSlotCreateSchema, TimeSlotUpdateSchema
 
 
 def validate_time_interval(start_time: datetime, end_time: datetime):
-    if start_time >= end_time:
+    normalized_start = normalize_datetime(start_time)
+    normalized_end = normalize_datetime(end_time)
+    if normalized_start >= normalized_end:
         raise HTTPException(
             status_code=400,
             detail="Start time must be earlier than end time",
@@ -26,7 +28,7 @@ def normalize_datetime(dt: datetime | None) -> datetime | None:
 
 
 def validate_start_time(start_time: datetime):
-    if normalize_datetime(start_time) <= datetime.now():
+    if normalize_datetime(start_time) <= normalize_datetime(datetime.now()):
         raise HTTPException(
             status_code=400,
             detail="Start time cannot be in the past",
@@ -109,7 +111,7 @@ async def update_timeslot(
     validate_time_interval(data.start_time, data.end_time)
     timeslot = await repository.get_timeslot_by_id(session, timeslot_id)
     if not timeslot:
-        raise HTTPException(status_code=404, detail="Timeslot does not exist")
+        raise HTTPException(status_code=404, detail="Timeslot not found")
 
     intersections = await repository.get_intersecting_timeslots(
         session,
@@ -141,7 +143,7 @@ async def partial_update_timeslot(
 
     timeslot = await repository.get_timeslot_by_id(session, timeslot_id)
     if not timeslot:
-        raise HTTPException(status_code=404, detail="Timeslot does not exist")
+        raise HTTPException(status_code=404, detail="Timeslot not found")
 
     new_room_id = data.room_id if data.room_id is not None else timeslot.room_id
     new_start = data.start_time if data.start_time is not None else timeslot.start_time
@@ -183,7 +185,7 @@ async def delete_timeslot(session: AsyncSession, timeslot_id: int):
     timeslot = await repository.get_timeslot_by_id(session, timeslot_id)
 
     if not timeslot:
-        raise HTTPException(status_code=404, detail="Timeslot does not exist")
+        raise HTTPException(status_code=404, detail="Timeslot not found")
 
     await repository.delete_timeslot(session, timeslot)
     await repository.save(session)

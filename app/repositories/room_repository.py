@@ -39,7 +39,7 @@ async def get_all_rooms(session: AsyncSession):
     return result.scalars().all()
 
 
-async def create_room(session: AsyncSession, name: str, capacity: str):
+async def create_room(session: AsyncSession, name: str, capacity: int):
     new_room = RoomModel(name=name, capacity=capacity)
     session.add(new_room)
     return new_room
@@ -61,5 +61,5 @@ async def partial_update_room(
     return room
 
 
-async def delete_user(session: AsyncSession, room: RoomModel):
+async def delete_room(session: AsyncSession, room: RoomModel):
     await session.delete(room)

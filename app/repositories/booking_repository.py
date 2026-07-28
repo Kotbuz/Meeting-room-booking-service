@@ -54,6 +54,12 @@ async def get_booking_by_timeslot(
     return result.scalars().first()
 
 
+async def get_bookings_by_user(session: AsyncSession, user_id: int):
+    query = select(BookingModel).where(BookingModel.user_id == user_id)
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
 async def get_all_bookings(session: AsyncSession):
     result = await session.execute(select(BookingModel))
     return result.scalars().all()

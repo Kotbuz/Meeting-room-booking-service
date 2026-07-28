@@ -37,10 +37,13 @@ async def get_all_rooms(session: AsyncSession):
 async def update_room(session: AsyncSession, room_id: int, data: RoomCreateSchema):
     room = await repository.get_room_by_id(session, room_id)
     if not room:
-        raise HTTPException(status_code=404, detail="Room does not exists")
+        raise HTTPException(status_code=404, detail="Room not found")
     existing_room = await repository.get_room_by_name(session, data.name)
     if existing_room and existing_room.id != room.id:
-        raise ValueError("Room with this name already exists")
+        raise HTTPException(
+            status_code=400,
+            detail="Room with this name already exists",
+        )
     updated_room = await repository.update_room(room, data.name, data.capacity)
     await repository.save(session)
     await repository.refresh(session, updated_room)
@@ -52,7 +55,7 @@ async def partial_update_room(
 ):
     room = await repository.get_room_by_id(session, room_id)
     if not room:
-        raise HTTPException(status_code=404, detail="Room does not exists")
+        raise HTTPException(status_code=404, detail="Room not found")
     if data.name is not None:
         existing_room = await repository.get_room_by_name(session, data.name)
         if existing_room and existing_room.id != room.id:
@@ -67,7 +70,7 @@ async def delete_room(session: AsyncSession, room_id: int):
     room = await repository.get_room_by_id(session, room_id)
 
     if not room:
-        raise HTTPException(status_code=404, detail="Room does not exists")
+        raise HTTPException(status_code=404, detail="Room not found")
     await repository.delete_room(session, room)
     await repository.save(session)
     return True

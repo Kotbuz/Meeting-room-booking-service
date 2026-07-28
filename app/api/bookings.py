@@ -22,11 +22,16 @@ async def get_bookings(session: SessionDep):
 
 
 @router.get("/{id}", response_model=BookingResponseSchema)
-async def get_booking(session: SessionDep, id: int):
+async def get_booking_by_id(session: SessionDep, id: int):
     booking = await service.get_booking_by_id(session, id)
     if not booking:
         raise HTTPException(404, "Booking not found")
     return booking
+
+
+@router.get("/user/{user_id}", response_model=list[BookingResponseSchema])
+async def get_bookings_by_user(session: SessionDep, user_id: int):
+    return await service.get_bookings_by_user(session, user_id)
 
 
 @router.put("/{id}", response_model=BookingResponseSchema)
