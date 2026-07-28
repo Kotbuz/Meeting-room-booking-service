@@ -15,7 +15,7 @@ async def create_user(session: AsyncSession, data: UserCreateSchema):
             status_code=400, detail="User with this login already exists"
         )
     new_user = await repository.create_user(
-        session, data.login, hashed_password, data.role
+        session, data.login, hashed_password, "user"
     )
     await repository.save(session)
     await repository.refresh(session, new_user)

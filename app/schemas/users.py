@@ -4,7 +4,6 @@ from pydantic import BaseModel
 class UserCreateSchema(BaseModel):
     login: str
     password: str
-    role: str
 
 
 class UserResponseSchema(BaseModel):
@@ -19,3 +18,11 @@ class UserUpdateSchema(BaseModel):
     role: str | None = None
 
 
+class UserLoginSchema(BaseModel):
+    login: str
+    password: str
+
+
+class TokenSchema(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
