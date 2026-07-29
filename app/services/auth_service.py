@@ -27,5 +27,3 @@ async def login(
         "token_type": "bearer",
     }
 
-
-def create_access_token(data: dict): ...
