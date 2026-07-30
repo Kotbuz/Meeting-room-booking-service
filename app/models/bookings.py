@@ -15,12 +15,27 @@ if TYPE_CHECKING:
 
 class BookingModel(Base):
     __tablename__ = "bookings"
+
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    timeslot_id: Mapped[int] = mapped_column(ForeignKey("timeslots.id"))
-    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"))
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+
+    timeslot_id: Mapped[int] = mapped_column(
+        ForeignKey("timeslots.id", ondelete="CASCADE")
+    )
+
+    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id", ondelete="CASCADE"))
+
     date: Mapped[datetime]
 
-    room: Mapped["RoomModel"] = relationship(back_populates="bookings")
-    user: Mapped["UserModel"] = relationship(back_populates="bookings")
-    timeslot: Mapped["TimeSlotModel"] = relationship(back_populates="bookings")
+    user: Mapped["UserModel"] = relationship(
+        back_populates="bookings",
+    )
+
+    room: Mapped["RoomModel"] = relationship(
+        back_populates="bookings",
+    )
+
+    timeslot: Mapped["TimeSlotModel"] = relationship(
+        back_populates="bookings",
+    )

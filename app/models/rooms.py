@@ -12,9 +12,19 @@ if TYPE_CHECKING:
 
 class RoomModel(Base):
     __tablename__ = "rooms"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     capacity: Mapped[int]
 
-    bookings: Mapped[list["BookingModel"]] = relationship(back_populates="room")
-    timeslots: Mapped[list["TimeSlotModel"]] = relationship(back_populates="room")
+    bookings: Mapped[list["BookingModel"]] = relationship(
+        back_populates="room",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+    timeslots: Mapped[list["TimeSlotModel"]] = relationship(
+        back_populates="room",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
