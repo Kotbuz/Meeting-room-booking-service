@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PATH="/root/.local/bin:$PATH"
 
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml ./
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 

@@ -29,14 +29,14 @@ def verify_password(
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
 
-    expire = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(UTC) + timedelta(minutes=settings.access_token_expire_minutes)
 
     to_encode.update({"exp": expire})
 
     return jwt.encode(
         to_encode,
-        settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM,
+        settings.secret_key,
+        algorithm=settings.algorithm,
     )
 
 
@@ -44,8 +44,8 @@ def decode_token(token: str) -> dict:
     try:
         payload = jwt.decode(
             token,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM],
+            settings.secret_key,
+            algorithms=[settings.algorithm],
         )
 
         if payload.get("sub") is None:
