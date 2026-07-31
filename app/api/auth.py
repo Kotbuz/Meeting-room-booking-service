@@ -8,7 +8,7 @@ from app.models.users import UserModel
 from app.schemas.users import UserResponseSchema
 
 from app.dependencies.base_dependencies import SessionDep
-from app.schemas.auth import LoginSchema, TokenSchema
+from app.schemas.auth import TokenSchema
 import app.services.auth_service as service
 
 router = APIRouter(tags=["Auth"])

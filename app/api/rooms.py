@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from app.dependencies.auth_dependencies import get_current_admin
 from app.dependencies.base_dependencies import SessionDep
 import app.services.room_service as service
 from app.schemas.rooms import RoomCreateSchema, RoomResponseSchema, RoomUpdateSchema
@@ -6,8 +7,16 @@ from app.schemas.rooms import RoomCreateSchema, RoomResponseSchema, RoomUpdateSc
 router = APIRouter(tags=["Rooms"])
 
 
-@router.post("/", status_code=201, response_model=RoomResponseSchema)
-async def create_room(session: SessionDep, data: RoomCreateSchema):
+@router.post(
+    "/",
+    status_code=201,
+    response_model=RoomResponseSchema,
+)
+async def create_room(
+    session: SessionDep,
+    data: RoomCreateSchema,
+    current_user=Depends(get_current_admin),
+):
     return await service.create_room(session, data)
 
 
@@ -48,15 +57,25 @@ async def update_room(
     session: SessionDep,
     id: int,
     data: RoomCreateSchema,
+    current_user=Depends(get_current_admin),
 ):
     return await service.update_room(session, id, data)
 
 
 @router.patch("/{id}", response_model=RoomResponseSchema)
-async def partial_update_room(session: SessionDep, id: int, data: RoomUpdateSchema):
+async def partial_update_room(
+    session: SessionDep,
+    id: int,
+    data: RoomUpdateSchema,
+    current_user=Depends(get_current_admin),
+):
     return await service.partial_update_room(session, id, data)
 
 
 @router.delete("/{id}", status_code=204)
-async def delete_room(session: SessionDep, id: int):
+async def delete_room(
+    session: SessionDep,
+    id: int,
+    current_user=Depends(get_current_admin),
+):
     await service.delete_room(session, id)

@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import security
+from app.core.roles import UserRole
 
 import app.repositories.user_repository as repository
 from app.schemas.users import UserCreateSchema, UserUpdateSchema
@@ -15,7 +16,7 @@ async def create_user(session: AsyncSession, data: UserCreateSchema):
             status_code=400, detail="User with this login already exists"
         )
     new_user = await repository.create_user(
-        session, data.login, hashed_password, "user"
+        session, data.login, hashed_password, UserRole.USER
     )
     await repository.save(session)
     await repository.refresh(session, new_user)
@@ -30,7 +31,7 @@ async def get_user_by_id(session: AsyncSession, user_id: int):
     return await repository.get_user_by_id(session, user_id)
 
 
-async def get_users_by_role(session: AsyncSession, role: str):
+async def get_users_by_role(session: AsyncSession, role: UserRole):
     return await repository.get_users_by_role(session, role)
 
 

@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from app.core.roles import UserRole
+
 
 class UserCreateSchema(BaseModel):
     login: str
@@ -9,13 +11,13 @@ class UserCreateSchema(BaseModel):
 class UserResponseSchema(BaseModel):
     id: int
     login: str
-    role: str
+    role: UserRole
 
 
 class UserUpdateSchema(BaseModel):
     login: str | None = None
     password: str | None = None
-    role: str | None = None
+    role: UserRole | None = None
 
 
 class UserLoginSchema(BaseModel):

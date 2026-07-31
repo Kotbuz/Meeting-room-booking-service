@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.roles import UserRole
 from app.models.users import UserModel
 
 
@@ -27,7 +28,7 @@ async def get_user_by_id(session: AsyncSession, user_id: int):
     return await session.get(UserModel, user_id)
 
 
-async def get_users_by_role(session: AsyncSession, role: str):
+async def get_users_by_role(session: AsyncSession, role: UserRole):
     query = select(UserModel).where(UserModel.role == role)
     result = await session.execute(query)
     return result.scalars().all()
@@ -40,7 +41,10 @@ async def get_all_users(session: AsyncSession):
 
 
 async def create_user(
-    session: AsyncSession, login: str, hashed_password: str, role: str
+    session: AsyncSession,
+    login: str,
+    hashed_password: str,
+    role: UserRole,
 ):
     new_user = UserModel(login=login, password_hash=hashed_password, role=role)
     session.add(new_user)
@@ -51,7 +55,7 @@ async def update_user(
     user: UserModel,
     login: str,
     hashed_password: str,
-    role: str,
+    role: UserRole,
 ):
     user.login = login
     user.password_hash = hashed_password
@@ -63,7 +67,7 @@ async def partial_update_user(
     user: UserModel,
     login: str | None = None,
     hashed_password: str | None = None,
-    role: str | None = None,
+    role: UserRole | None = None,
 ):
     if login is not None:
         user.login = login

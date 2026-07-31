@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from app.dependencies.auth_dependencies import get_current_admin
 from app.dependencies.base_dependencies import SessionDep
 import app.services.timeslot_service as service
 from app.schemas.timeslots import (
@@ -12,8 +13,16 @@ from app.schemas.timeslots import (
 router = APIRouter(tags=["Timeslots"])
 
 
-@router.post("/", status_code=201, response_model=TimeSlotResponseSchema)
-async def create_timeslot(session: SessionDep, data: TimeSlotCreateSchema):
+@router.post(
+    "/",
+    status_code=201,
+    response_model=TimeSlotResponseSchema,
+)
+async def create_timeslot(
+    session: SessionDep,
+    data: TimeSlotCreateSchema,
+    current_user=Depends(get_current_admin),
+):
     return await service.create_timeslot(session, data)
 
 
@@ -63,17 +72,25 @@ async def update_timeslot(
     session: SessionDep,
     id: int,
     data: TimeSlotCreateSchema,
+    current_user=Depends(get_current_admin),
 ):
     return await service.update_timeslot(session, id, data)
 
 
 @router.patch("/{id}", response_model=TimeSlotResponseSchema)
 async def partial_update_timeslot(
-    session: SessionDep, id: int, data: TimeSlotUpdateSchema
+    session: SessionDep,
+    id: int,
+    data: TimeSlotUpdateSchema,
+    current_user=Depends(get_current_admin),
 ):
     return await service.partial_update_timeslot(session, id, data)
 
 
 @router.delete("/{id}", status_code=204)
-async def delete_timeslot(session: SessionDep, id: int):
+async def delete_timeslot(
+    session: SessionDep,
+    id: int,
+    current_user=Depends(get_current_admin),
+):
     await service.delete_timeslot(session, id)

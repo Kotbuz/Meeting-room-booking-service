@@ -1,9 +1,10 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError
 
 from app.dependencies.base_dependencies import SessionDep
+from app.core.roles import UserRole
 from app.core.security import decode_token
+from app.models.users import UserModel
 import app.repositories.user_repository as user_repository
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -30,3 +31,15 @@ async def get_current_user(
             detail="User not found",
         )
     return user
+
+
+async def get_current_admin(
+    current_user: UserModel = Depends(get_current_user),
+):
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied",
+        )
+
+    return current_user
