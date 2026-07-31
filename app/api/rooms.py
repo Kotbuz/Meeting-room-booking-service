@@ -25,8 +25,16 @@ async def get_rooms(
     session: SessionDep,
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    capacity: int | None = Query(default=None, ge=1),
+    name: str | None = Query(default=None),
 ):
-    return await service.get_all_rooms(session, limit=limit, offset=offset)
+    return await service.get_all_rooms(
+        session,
+        limit=limit,
+        offset=offset,
+        capacity=capacity,
+        name=name,
+    )
 
 
 @router.get("/{id}", response_model=RoomResponseSchema)
