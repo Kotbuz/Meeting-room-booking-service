@@ -1,7 +1,15 @@
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.repositories.booking_repository as repository
+from app.core.exceptions import (
+    BookingAlreadyExistsError,
+    BookingNotFoundError,
+    ForbiddenError,
+    RoomNotFoundError,
+    TimeslotNotFoundError,
+    TimeslotPassedError,
+    UserNotFoundError,
+)
 from app.repositories import (
     room_repository,
     timeslot_repository,
@@ -27,39 +35,24 @@ def normalize_datetime(dt: datetime | None) -> datetime | None:
 async def create_booking(session: AsyncSession, data: BookingCreateSchema):
     user = await user_repository.get_user_by_id(session, data.user_id)
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found",
-        )
+        raise UserNotFoundError()
 
     room = await room_repository.get_room_by_id(session, data.room_id)
     if not room:
-        raise HTTPException(
-            status_code=404,
-            detail="Room not found",
-        )
+        raise RoomNotFoundError()
 
     timeslot = await timeslot_repository.get_timeslot_by_id(
         session,
         data.timeslot_id,
     )
     if not timeslot:
-        raise HTTPException(
-            status_code=404,
-            detail="Timeslot not found",
-        )
+        raise TimeslotNotFoundError()
 
     if timeslot.room_id != data.room_id:
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot does not belong to this room",
-        )
+        raise BookingAlreadyExistsError("Timeslot does not belong to this room")
 
     if timeslot.end_time <= datetime.utcnow():
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot already passed",
-        )
+        raise TimeslotPassedError()
 
     existing_booking = await repository.get_booking_by_timeslot(
         session,
@@ -67,10 +60,7 @@ async def create_booking(session: AsyncSession, data: BookingCreateSchema):
     )
 
     if existing_booking:
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot is already booked",
-        )
+        raise BookingAlreadyExistsError()
 
     new_booking = await repository.create_booking(
         session,
@@ -92,7 +82,7 @@ async def get_booking_by_id(session: AsyncSession, booking_id: int):
 async def get_bookings_by_user(session: AsyncSession, user_id: int):
     user = await user_repository.get_user_by_id(session, user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise UserNotFoundError()
     return await repository.get_bookings_by_user(session, user_id)
 
 
@@ -107,46 +97,28 @@ async def update_booking(
 ):
     booking = await repository.get_booking_by_id(session, booking_id)
     if not booking:
-        raise HTTPException(
-            status_code=404,
-            detail="Booking not found",
-        )
+        raise BookingNotFoundError()
 
     user = await user_repository.get_user_by_id(session, data.user_id)
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found",
-        )
+        raise UserNotFoundError()
 
     room = await room_repository.get_room_by_id(session, data.room_id)
     if not room:
-        raise HTTPException(
-            status_code=404,
-            detail="Room not found",
-        )
+        raise RoomNotFoundError()
 
     timeslot = await timeslot_repository.get_timeslot_by_id(
         session,
         data.timeslot_id,
     )
     if not timeslot:
-        raise HTTPException(
-            status_code=404,
-            detail="Timeslot not found",
-        )
+        raise TimeslotNotFoundError()
 
     if timeslot.room_id != data.room_id:
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot does not belong to this room",
-        )
+        raise BookingAlreadyExistsError("Timeslot does not belong to this room")
 
     if timeslot.end_time <= datetime.utcnow():
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot already passed",
-        )
+        raise TimeslotPassedError()
 
     existing_booking = await repository.get_booking_by_timeslot(
         session,
@@ -155,10 +127,7 @@ async def update_booking(
     )
 
     if existing_booking:
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot is already booked",
-        )
+        raise BookingAlreadyExistsError()
 
     updated_booking = await repository.update_booking(
         booking,
@@ -180,10 +149,7 @@ async def partial_update_booking(
 ):
     booking = await repository.get_booking_by_id(session, booking_id)
     if not booking:
-        raise HTTPException(
-            status_code=404,
-            detail="Booking not found",
-        )
+        raise BookingNotFoundError()
 
     new_user_id = data.user_id or booking.user_id
     new_room_id = data.room_id or booking.room_id
@@ -191,39 +157,24 @@ async def partial_update_booking(
 
     user = await user_repository.get_user_by_id(session, new_user_id)
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found",
-        )
+        raise UserNotFoundError()
 
     room = await room_repository.get_room_by_id(session, new_room_id)
     if not room:
-        raise HTTPException(
-            status_code=404,
-            detail="Room not found",
-        )
+        raise RoomNotFoundError()
 
     timeslot = await timeslot_repository.get_timeslot_by_id(
         session,
         new_timeslot_id,
     )
     if not timeslot:
-        raise HTTPException(
-            status_code=404,
-            detail="Timeslot not found",
-        )
+        raise TimeslotNotFoundError()
 
     if timeslot.room_id != new_room_id:
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot does not belong to this room",
-        )
+        raise BookingAlreadyExistsError("Timeslot does not belong to this room")
 
     if timeslot.end_time <= datetime.utcnow():
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot already passed",
-        )
+        raise TimeslotPassedError()
 
     existing_booking = await repository.get_booking_by_timeslot(
         session,
@@ -232,10 +183,7 @@ async def partial_update_booking(
     )
 
     if existing_booking:
-        raise HTTPException(
-            status_code=400,
-            detail="Timeslot is already booked",
-        )
+        raise BookingAlreadyExistsError()
 
     updated_booking = await repository.partial_update_booking(
         booking,
@@ -257,10 +205,7 @@ async def delete_booking(
     booking = await repository.get_booking_by_id(session, booking_id)
 
     if not booking:
-        raise HTTPException(
-            status_code=404,
-            detail="Booking not found",
-        )
+        raise BookingNotFoundError()
 
     await repository.delete_booking(session, booking)
     await repository.save(session)

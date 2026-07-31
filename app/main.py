@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from app.api import main_router
 from app.core.config import settings
+from app.core.exceptions import AppException
 from app.core.roles import UserRole
 from app.core.security import hash_password
 from app.db.database import new_session
@@ -28,6 +30,14 @@ async def create_default_admin_user() -> None:
 
 
 app = FastAPI()
+
+
+@app.exception_handler(AppException)
+async def app_exception_handler(request: Request, exc: AppException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
 
 
 @app.on_event("startup")
