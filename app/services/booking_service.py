@@ -55,6 +55,12 @@ async def create_booking(session: AsyncSession, data: BookingCreateSchema):
             detail="Timeslot does not belong to this room",
         )
 
+    if timeslot.end_time <= datetime.utcnow():
+        raise HTTPException(
+            status_code=400,
+            detail="Timeslot already passed",
+        )
+
     existing_booking = await repository.get_booking_by_timeslot(
         session,
         data.timeslot_id,
@@ -136,6 +142,12 @@ async def update_booking(
             detail="Timeslot does not belong to this room",
         )
 
+    if timeslot.end_time <= datetime.utcnow():
+        raise HTTPException(
+            status_code=400,
+            detail="Timeslot already passed",
+        )
+
     existing_booking = await repository.get_booking_by_timeslot(
         session,
         data.timeslot_id,
@@ -205,6 +217,12 @@ async def partial_update_booking(
         raise HTTPException(
             status_code=400,
             detail="Timeslot does not belong to this room",
+        )
+
+    if timeslot.end_time <= datetime.utcnow():
+        raise HTTPException(
+            status_code=400,
+            detail="Timeslot already passed",
         )
 
     existing_booking = await repository.get_booking_by_timeslot(

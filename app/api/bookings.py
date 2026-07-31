@@ -34,6 +34,14 @@ async def get_bookings(
     return await service.get_bookings_by_user(session, current_user.id)
 
 
+@router.get("/me", response_model=list[BookingResponseSchema])
+async def get_my_bookings(
+    session: SessionDep,
+    current_user: UserModel = Depends(get_current_user),
+):
+    return await service.get_bookings_by_user(session, current_user.id)
+
+
 @router.get("/{id}", response_model=BookingResponseSchema)
 async def get_booking_by_id(
     session: SessionDep,
