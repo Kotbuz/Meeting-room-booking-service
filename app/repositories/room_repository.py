@@ -33,8 +33,8 @@ async def get_room_by_capacity(session: AsyncSession, room_capacity: int):
     return result.scalars().all()
 
 
-async def get_all_rooms(session: AsyncSession):
-    query = select(RoomModel)
+async def get_all_rooms(session: AsyncSession, limit: int = 20, offset: int = 0):
+    query = select(RoomModel).limit(limit).offset(offset)
     result = await session.execute(query)
     return result.scalars().all()
 

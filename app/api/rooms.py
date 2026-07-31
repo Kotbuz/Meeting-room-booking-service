@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.dependencies.auth_dependencies import get_current_admin
 from app.dependencies.base_dependencies import SessionDep
 import app.services.room_service as service
@@ -21,8 +21,12 @@ async def create_room(
 
 
 @router.get("/", response_model=list[RoomResponseSchema])
-async def get_rooms(session: SessionDep):
-    return await service.get_all_rooms(session)
+async def get_rooms(
+    session: SessionDep,
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+):
+    return await service.get_all_rooms(session, limit=limit, offset=offset)
 
 
 @router.get("/{id}", response_model=RoomResponseSchema)

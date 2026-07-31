@@ -30,8 +30,8 @@ async def get_rooms_by_capacity(session: AsyncSession, capacity: int):
     return await repository.get_room_by_capacity(session, capacity)
 
 
-async def get_all_rooms(session: AsyncSession):
-    return await repository.get_all_rooms(session)
+async def get_all_rooms(session: AsyncSession, limit: int = 20, offset: int = 0):
+    return await repository.get_all_rooms(session, limit=limit, offset=offset)
 
 
 async def update_room(session: AsyncSession, room_id: int, data: RoomCreateSchema):

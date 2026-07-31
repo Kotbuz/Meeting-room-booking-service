@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta, UTC
 
-from fastapi import HTTPException
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
+from app.core.exceptions import InvalidCredentialsError, InvalidTokenError
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -49,15 +49,9 @@ def decode_token(token: str) -> dict:
         )
 
         if payload.get("sub") is None:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid token",
-            )
+            raise InvalidTokenError("Invalid token")
 
         return payload
 
     except JWTError:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid or expired token",
-        )
+        raise InvalidTokenError()

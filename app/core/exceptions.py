@@ -38,3 +38,23 @@ class TimeslotPassedError(AppException):
 class ForbiddenError(AppException):
     def __init__(self, detail: str = "Access denied"):
         super().__init__(status_code=403, detail=detail)
+
+
+class UnauthorizedError(AppException):
+    def __init__(self, detail: str = "Unauthorized"):
+        super().__init__(status_code=401, detail=detail)
+
+
+class InvalidTokenError(UnauthorizedError):
+    def __init__(self, detail: str = "Invalid or expired token"):
+        super().__init__(detail=detail)
+
+
+class InvalidCredentialsError(UnauthorizedError):
+    def __init__(self, detail: str = "Incorrect password"):
+        super().__init__(detail=detail)
+
+
+class ConflictError(AppException):
+    def __init__(self, detail: str = "Conflict"):
+        super().__init__(status_code=409, detail=detail)
