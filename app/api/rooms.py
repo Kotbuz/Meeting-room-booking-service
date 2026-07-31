@@ -1,3 +1,5 @@
+from datetime import date, datetime, time
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.dependencies.auth_dependencies import get_current_admin
 from app.dependencies.base_dependencies import SessionDep
@@ -32,6 +34,33 @@ async def get_rooms(
         session,
         limit=limit,
         offset=offset,
+        capacity=capacity,
+        name=name,
+    )
+
+
+@router.get("/free", response_model=list[RoomResponseSchema])
+async def get_free_rooms(
+    session: SessionDep,
+    date_: date = Query(..., alias="date"),
+    start: time = Query(...),
+    end: time = Query(...),
+    capacity: int | None = Query(default=None, ge=1),
+    name: str | None = Query(default=None),
+):
+    start_datetime = datetime.combine(date_, start)
+    end_datetime = datetime.combine(date_, end)
+
+    if start_datetime >= end_datetime:
+        raise HTTPException(
+            status_code=400,
+            detail="Start time must be earlier than end time",
+        )
+
+    return await service.get_free_rooms(
+        session,
+        start_time=start_datetime,
+        end_time=end_datetime,
         capacity=capacity,
         name=name,
     )

@@ -1,7 +1,11 @@
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.bookings import BookingModel
 from app.models.rooms import RoomModel
+from app.models.timeslots import TimeSlotModel
 
 
 async def save(session: AsyncSession):
@@ -49,6 +53,45 @@ async def get_all_rooms(
         query = query.where(RoomModel.name.ilike(f"%{name}%"))
 
     query = query.limit(limit).offset(offset)
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
+async def get_free_rooms(
+    session: AsyncSession,
+    start_time: datetime,
+    end_time: datetime,
+    capacity: int | None = None,
+    name: str | None = None,
+):
+    available_room_ids_query = (
+        select(TimeSlotModel.room_id)
+        .where(TimeSlotModel.start_time < end_time)
+        .where(TimeSlotModel.end_time > start_time)
+        .distinct()
+    )
+
+    booked_room_ids_query = (
+        select(BookingModel.room_id)
+        .join(TimeSlotModel, TimeSlotModel.id == BookingModel.timeslot_id)
+        .where(BookingModel.date >= start_time)
+        .where(BookingModel.date < end_time)
+        .where(TimeSlotModel.start_time < end_time)
+        .where(TimeSlotModel.end_time > start_time)
+        .distinct()
+    )
+
+    query = select(RoomModel).where(
+        RoomModel.id.in_(available_room_ids_query),
+        ~RoomModel.id.in_(booked_room_ids_query),
+    )
+
+    if capacity is not None:
+        query = query.where(RoomModel.capacity == capacity)
+
+    if name is not None:
+        query = query.where(RoomModel.name.ilike(f"%{name}%"))
+
     result = await session.execute(query)
     return result.scalars().all()
 

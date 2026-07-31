@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,6 +43,22 @@ async def get_all_rooms(
         session,
         limit=limit,
         offset=offset,
+        capacity=capacity,
+        name=name,
+    )
+
+
+async def get_free_rooms(
+    session: AsyncSession,
+    start_time: datetime,
+    end_time: datetime,
+    capacity: int | None = None,
+    name: str | None = None,
+):
+    return await repository.get_free_rooms(
+        session,
+        start_time=start_time,
+        end_time=end_time,
         capacity=capacity,
         name=name,
     )
