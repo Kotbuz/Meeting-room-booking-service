@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
 
+    # Admin bootstrap
+    admin_login: str = "admin"
+    admin_password: str = "admin"
+
     # FastAPI
     debug: bool = False
 
@@ -26,8 +30,6 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
-
-
 
 
 settings = Settings()

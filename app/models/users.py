@@ -18,7 +18,11 @@ class UserModel(Base):
     login: Mapped[str]
     password_hash: Mapped[str]
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole),
+        Enum(
+            UserRole,
+            name="userrole",
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+        ),
         default=UserRole.USER,
         nullable=False,
     )
