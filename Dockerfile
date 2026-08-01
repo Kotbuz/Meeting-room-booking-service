@@ -1,16 +1,23 @@
-FROM python:3.11
+FROM python:3.11-slim
 
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+ENV PIP_NO_CACHE_DIR=1
 ENV PATH="/root/.local/bin:$PATH"
 
-COPY pyproject.toml ./
+RUN pip install --upgrade pip "poetry>=2.0,<3.0"
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
+COPY pyproject.toml README.md ./
 
-RUN poetry config virtualenvs.create false
-RUN poetry install --only main --no-root && poetry cache clear pypi --all 
-COPY . . 
-CMD ["python", "app/main.py"]
+RUN poetry config virtualenvs.create false \
+    && poetry lock \
+    && poetry install --only main --no-root --no-interaction --no-ansi
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

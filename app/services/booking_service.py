@@ -21,7 +21,7 @@ from app.schemas.bookings import (
     BookingUpdateSchema,
 )
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def normalize_datetime(dt: datetime | None) -> datetime | None:
@@ -51,7 +51,7 @@ async def create_booking(session: AsyncSession, data: BookingCreateSchema):
     if timeslot.room_id != data.room_id:
         raise BookingAlreadyExistsError("Timeslot does not belong to this room")
 
-    if timeslot.end_time <= datetime.utcnow():
+    if timeslot.end_time <= datetime.now(timezone.utc).replace(tzinfo=None):
         raise TimeslotPassedError()
 
     existing_booking = await repository.get_booking_by_timeslot(
@@ -173,7 +173,7 @@ async def partial_update_booking(
     if timeslot.room_id != new_room_id:
         raise BookingAlreadyExistsError("Timeslot does not belong to this room")
 
-    if timeslot.end_time <= datetime.utcnow():
+    if timeslot.end_time <= datetime.now(timezone.utc).replace(tzinfo=None):
         raise TimeslotPassedError()
 
     existing_booking = await repository.get_booking_by_timeslot(

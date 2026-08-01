@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +28,8 @@ def normalize_datetime(dt: datetime | None) -> datetime | None:
 
 
 def validate_start_time(start_time: datetime):
-    if normalize_datetime(start_time) <= normalize_datetime(datetime.now()):
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    if normalize_datetime(start_time) <= now_utc:
         raise HTTPException(
             status_code=400,
             detail="Start time cannot be in the past",
