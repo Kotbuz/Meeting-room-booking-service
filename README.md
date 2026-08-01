@@ -60,7 +60,7 @@ ADMIN_PASSWORD=admin
 1. Установите зависимости:
 
 ```bash
-poetry install
+python -m poetry install
 ```
 
 2. Запустите PostgreSQL в контейнере:
@@ -72,7 +72,7 @@ docker compose up -d db
 3. Запустите сервер:
 
 ```bash
-poetry run uvicorn app.main:app --host 127.0.0.1 --port 8000
+python -m poetry run uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 4. Откройте API:
